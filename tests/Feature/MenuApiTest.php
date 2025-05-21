@@ -29,19 +29,48 @@ class MenuApiTest extends TestCase
     {
         Menu::factory()->count(3)->create(); // Buat 3 menu dummy
 
-        $response = $this->getJson('/api/v1/menus');
+            $response = $this->getJson('/api/v1/menus');
 
-        $response->assertStatus(200)
-                 ->assertJsonStructure([ // Pastikan struktur response sesuai
-                     'success',
-                     'message',
-                     'data' => [
-                         '*' => ['menu_id', 'name', 'price', 'category', 'stock', 'is_available', 'image_url', 'full_image_url']
+       $response->assertStatus(200)
+             ->assertJsonStructure([
+                 'success', // Kunci di root JSON
+                 'message', // Kunci di root JSON
+                 'data' => [ // Kunci 'data' di root JSON, yang berisi objek paginator
+                     'current_page',
+                     'data' => [ // Kunci 'data' di dalam objek paginator, ini adalah array item menu
+                         '*' => [ // Setiap item di dalam array 'data' milik paginator
+                             'menu_id',
+                             'name',
+                             'price',
+                             'category',
+                             'stock',
+                             'is_available',
+                             'image_url',
+                             'full_image_url',
+                             'created_at',
+                             'updated_at',
+                         ]
                      ],
-                     'links', // Untuk pagination
-                     'meta'
-                 ])
-                 ->assertJsonCount(3, 'data'); // Pastikan ada 3 menu di data
+                     'first_page_url',
+                     'from',
+                     'last_page',
+                     'last_page_url',
+                     'links' => [ // Kunci 'links' di dalam objek paginator
+                        '*' => [ // Setiap item di dalam array 'links'
+                            'url',
+                            'label',
+                            'active',
+                        ]
+                     ],
+                     'next_page_url',
+                     'path',
+                     'per_page',
+                     'prev_page_url',
+                     'to',
+                     'total',
+                 ]
+             ])
+             ->assertJsonCount(3, 'data.data'); // Hitung item di dalam 'data'.'data'
     }
 
     #[Test]
