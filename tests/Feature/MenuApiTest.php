@@ -6,6 +6,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase; // Reset database untuk setia
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Http\UploadedFile; // Untuk simulasi file upload
 use Illuminate\Support\Facades\Storage; // Untuk interaksi dengan storage
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 use App\Models\Menu;
 use App\Models\User; // Jika perlu user untuk otentikasi
@@ -23,7 +24,7 @@ class MenuApiTest extends TestCase
         Storage::fake('public'); // Fake storage agar tidak benar-benar menulis file
     }
 
-    /** @test */
+    #[Test]
     public function can_get_all_menus()
     {
         Menu::factory()->count(3)->create(); // Buat 3 menu dummy
@@ -43,7 +44,7 @@ class MenuApiTest extends TestCase
                  ->assertJsonCount(3, 'data'); // Pastikan ada 3 menu di data
     }
 
-    /** @test */
+    #[Test]
     public function can_create_a_menu_with_image()
     {
         // $this->actingAs($this->admin, 'sanctum'); // Jika perlu otentikasi
@@ -70,7 +71,7 @@ class MenuApiTest extends TestCase
         Storage::disk('public')->assertExists($createdMenu->image_url); // Cek file ada di fake storage
     }
 
-    /** @test */
+    #[Test]
     public function create_menu_fails_with_invalid_data()
     {
         $response = $this->postJson('/api/v1/menus', ['name' => '']); // Nama kosong
@@ -79,7 +80,7 @@ class MenuApiTest extends TestCase
                  ->assertJsonValidationErrors(['name']); // Pastikan ada error validasi untuk 'name'
     }
 
-    /** @test */
+    #[Test]
     public function can_get_a_single_menu()
     {
         $menu = Menu::factory()->create();
@@ -90,7 +91,7 @@ class MenuApiTest extends TestCase
                  ->assertJsonPath('data.menu_id', $menu->menu_id);
     }
 
-    /** @test */
+    #[Test]
     public function get_single_menu_returns_404_if_not_found()
     {
         $response = $this->getJson('/api/v1/menus/999'); // ID yang tidak ada
@@ -98,7 +99,7 @@ class MenuApiTest extends TestCase
     }
 
 
-    /** @test */
+    #[Test]
     public function can_update_a_menu()
     {
         $menu = Menu::factory()->create();
@@ -118,7 +119,7 @@ class MenuApiTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function can_delete_a_menu_with_its_image()
     {
         // Buat menu dengan gambar
