@@ -2,15 +2,16 @@
 
 namespace App\Models;
 
+use Laravel\Sanctum\HasApiTokens; // <--- IMPORT NAMESPACE YANG BENAR
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-    use  HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable; // <--- GUNAKAN TRAITNYA
 
-    protected $primaryKey = 'user_id'; // Tentukan PK
+    protected $primaryKey = 'user_id';
 
     protected $fillable = [
         'name',
@@ -26,12 +27,9 @@ class User extends Authenticatable
     ];
 
     protected $casts = [
-        'email_verified_at' => 'datetime', // Jika ada field ini
+        'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
-
-    // Jika hanya ada 'created_at' dan tidak ada 'updated_at' sesuai skema awal
-    // const UPDATED_AT = null;
 
     public function orders()
     {
@@ -43,4 +41,3 @@ class User extends Authenticatable
         return $this->hasMany(NotificationModel::class, 'user_id', 'user_id');
     }
 }
-
