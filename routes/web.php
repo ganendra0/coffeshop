@@ -6,6 +6,16 @@ use App\Http\Controllers\Auth\LoginController; // Kita akan buat controller ini 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Http\Controllers\MenuController; 
+use App\Http\Controllers\OrderController;
+use App\Http\Controllers\OrderItemController;
+use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\DriverController;
+use App\Http\Controllers\DeliveryController;
+
+
+
 
 /*
 |--------------------------------------------------------------------------
@@ -64,6 +74,13 @@ Route::middleware(['auth'])->group(function () {
     // Route untuk users (yang sudah Anda buat sebelumnya)
     Route::resource('users', UserController::class)->parameters(['users' => 'user_id']);
     Route::resource('menus', MenuController::class)->parameters(['menus' => 'menu_id']);
+    Route::resource('orders', OrderController::class)->parameters(['orders' => 'order_id']);
+    Route::resource('order_items', OrderItemController::class)->parameters(['order_items' => 'order_item']);
+    Route::resource('payments', PaymentController::class)->parameters(['payments' => 'payment']);
+    Route::resource('reviews', ReviewController::class)->parameters(['reviews' => 'review']);
+    Route::resource('notifications', NotificationController::class)->parameters(['notifications' => 'notification']);
+    Route::resource('drivers', DriverController::class)->parameters(['drivers' => 'driver']);
+    Route::resource('deliveries', DeliveryController::class)->parameters(['deliveries' => 'delivery']);
 
     // ... route lain yang butuh login bisa ditambahkan di sini
     // Contoh:
