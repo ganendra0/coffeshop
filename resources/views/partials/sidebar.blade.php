@@ -5,12 +5,6 @@
         </h6>
         <ul class="nav flex-column">
             <li class="nav-item">
-                <a class="nav-link {{ request()->routeIs('dashboard*') ? 'active' : '' }}" aria-current="page" href="#"> {{-- Ganti # dengan route dashboard Anda --}}
-                    <i class="fas fa-tachometer-alt fa-fw me-2"></i>
-                    Dashboard
-                </a>
-            </li>
-            <li class="nav-item">
                 <a class="nav-link {{ request()->routeIs('users.*') ? 'active' : '' }}" href="{{ route('users.index') }}">
                     <i class="fas fa-users fa-fw me-2"></i>
                     Users
@@ -23,11 +17,49 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="#"> {{-- Ganti # dengan route menu lain --}}
-                    <i class="fas fa-file-alt fa-fw me-2"></i>
-                    Pesanan (Contoh)
+                <a class="nav-link {{ request()->routeIs('orders.*') ? 'active' : '' }}" href="{{ route('orders.index') }}">
+                    <i class="fas fa-shopping-cart fa-fw me-2"></i> {{-- Atau ikon lain seperti fa-file-invoice-dollar --}}
+                    Orders
                 </a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link {{ request()->routeIs('order_items.*') ? 'active' : '' }}" href="{{ route('order_items.index') }}">
+                    <i class="fas fa-receipt fa-fw me-2"></i>
+                     Order Items
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {{ request()->routeIs('payments.*') ? 'active' : '' }}" href="{{ route('payments.index') }}">
+                    <i class="fas fa-money-check-alt fa-fw me-2"></i>
+                    Payments
+                </a>
+            </li>
+            <li class="nav-item">
+    <a class="nav-link {{ request()->routeIs('reviews.*') ? 'active' : '' }}" href="{{ route('reviews.index') }}">
+        <i class="fas fa-star fa-fw me-2"></i>
+        Reviews
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link {{ request()->routeIs('notifications.*') ? 'active' : '' }}" href="{{ route('notifications.index') }}">
+        <i class="fas fa-bell fa-fw me-2"></i>
+        Notifications
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link {{ request()->routeIs('drivers.*') ? 'active' : '' }}" href="{{ route('drivers.index') }}">
+        <i class="fas fa-shipping-fast fa-fw me-2"></i> {{-- Atau ikon lain seperti fa-id-card, fa-motorcycle --}}
+        Drivers
+    </a>
+</li>
+{{-- ... Menu Drivers ... --}}
+<li class="nav-item">
+    <a class="nav-link {{ request()->routeIs('deliveries.*') ? 'active' : '' }}" href="{{ route('deliveries.index') }}">
+        <i class="fas fa-truck fa-fw me-2"></i>
+        Deliveries
+    </a>
+</li>
+{{-- ... Menu lainnya ... --}}
         </ul>
 
         <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted text-uppercase">
