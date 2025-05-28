@@ -3689,3 +3689,30 @@
 #19 /Applications/XAMPP/xamppfiles/htdocs/tokokopiback/coffeeshop-crud/artisan(16): Illuminate\\Foundation\\Application->handleCommand(Object(Symfony\\Component\\Console\\Input\\ArgvInput))
 #20 {main}
 "} 
+[2025-05-23 01:40:12] local.ERROR: Command "migrte" is not defined.
+
+Did you mean one of these?
+    migrate
+    migrate:fresh
+    migrate:install
+    migrate:refresh
+    migrate:reset
+    migrate:rollback
+    migrate:status {"exception":"[object] (Symfony\\Component\\Console\\Exception\\CommandNotFoundException(code: 0): Command \"migrte\" is not defined.
+
+Did you mean one of these?
+    migrate
+    migrate:fresh
+    migrate:install
+    migrate:refresh
+    migrate:reset
+    migrate:rollback
+    migrate:status at /var/www/html/coffeeshop-crud/vendor/symfony/console/Application.php:726)
+[stacktrace]
+#0 /var/www/html/coffeeshop-crud/vendor/symfony/console/Application.php(284): Symfony\\Component\\Console\\Application->find()
+#1 /var/www/html/coffeeshop-crud/vendor/symfony/console/Application.php(193): Symfony\\Component\\Console\\Application->doRun()
+#2 /var/www/html/coffeeshop-crud/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(197): Symfony\\Component\\Console\\Application->run()
+#3 /var/www/html/coffeeshop-crud/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1234): Illuminate\\Foundation\\Console\\Kernel->handle()
+#4 /var/www/html/coffeeshop-crud/artisan(16): Illuminate\\Foundation\\Application->handleCommand()
+#5 {main}
+"} 

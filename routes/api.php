@@ -4,7 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 // Import Controller yang akan digunakan
-use App\Http\Controllers\Api\AuthController; // Tambahkan ini
+use App\Http\Controllers\Api\AuthController; 
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\MenuController;
 use App\Http\Controllers\Api\OrderController;
@@ -22,9 +22,7 @@ use App\Http\Controllers\Api\ReviewController;
 */
 
 // --- Rute Autentikasi ---
-// Anda bisa memilih prefix sendiri, misal 'auth' atau langsung di root API
-// Saya akan gunakan prefix 'v1/auth' agar konsisten dengan resource Anda yang lain
-Route::prefix('v1/auth')->group(function () {
+    Route::prefix('v1/auth')->group(function () {
     Route::post('/register', [AuthController::class, 'register'])->name('api.auth.register');
     Route::post('/login', [AuthController::class, 'login'])->name('api.auth.login');
 
@@ -34,19 +32,14 @@ Route::prefix('v1/auth')->group(function () {
         Route::get('/user', [AuthController::class, 'user'])->name('api.auth.user'); // Menggantikan closure lama
         Route::put('/user/profile', [AuthController::class, 'updateProfile'])->name('api.auth.profile.update');
         Route::put('/user/password', [AuthController::class, 'changePassword'])->name('api.auth.password.change');
-            
+
     });
 });
 
 
 // --- Rute Resource (API v1) ---
 Route::prefix('v1')->group(function () {
-    // UserController: Untuk manajemen user oleh admin (jika diperlukan).
-    // Jika CRUD User hanya untuk admin, pastikan route ini juga dilindungi (misal dengan middleware admin).
-    // Untuk sekarang, saya asumsikan ini dilindungi oleh Sanctum secara umum jika dipanggil oleh admin yang login.
     Route::apiResource('users', UserController::class)->middleware('auth:sanctum'); // Melindungi CRUD User
-
-    // Resource lain, bisa saja ada yang publik dan ada yang perlu login
     Route::apiResource('menus', MenuController::class); // Menu bisa dilihat publik
 
     // Resource yang biasanya memerlukan autentikasi user

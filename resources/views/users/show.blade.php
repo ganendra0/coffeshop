@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="container-fluid">
-    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4"> 
         <h1 class="h3 mb-0 text-gray-800">Detail Pengguna: {{ $user->name }}</h1>
         <div>
             <a href="{{ route('users.edit', $user->user_id) }}" class="btn btn-warning shadow-sm me-2">

@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\User; // Pastikan model User di-import
+use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -22,8 +22,8 @@ class AuthController extends Controller
         $validator = Validator::make($request->all(), [
             'name'     => 'required|string|max:50',
             'email'    => 'required|string|email|max:50|unique:users,email',
-            'phone'    => 'required|string|max:15', // Anda bisa tambahkan validasi format nomor telepon jika perlu
-            'password' => 'required|string|min:8|confirmed', // 'confirmed' akan mencari field 'password_confirmation'
+            'phone'    => 'required|string|max:15', 
+            'password' => 'required|string|min:8|confirmed',
             'address'  => 'nullable|string|max:255',
         ]);
 
@@ -43,8 +43,7 @@ class AuthController extends Controller
             'address'  => $request->address,
         ]);
 
-        // Anda bisa memilih untuk langsung login setelah registrasi atau tidak.
-        // Jika ya, buat token di sini. Untuk sekarang, kita minta user login manual setelah registrasi.
+    //kita minta user login manual setelah registrasi.
         return response()->json([
             'success' => true,
             'message' => 'Registrasi berhasil. Silakan login.',
