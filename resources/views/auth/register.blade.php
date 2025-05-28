@@ -17,7 +17,7 @@
         }
         .register-form {
             width: 100%;
-            max-width: 500px; /* Sedikit lebih lebar untuk form registrasi */
+            max-width: 500px;
             padding: 20px;
             margin: auto;
             background-color: #fff;
@@ -53,8 +53,8 @@
             </div>
 
             <div class="form-floating mb-3">
-                <input type="text" class="form-control @error('phone') is-invalid @enderror" id="phone" name="phone" placeholder="Nomor Telepon (Opsional)" value="{{ old('phone') }}">
-                <label for="phone">Nomor Telepon (Opsional)</label>
+                <input type="text" class="form-control @error('phone') is-invalid @enderror" id="phone" name="phone" placeholder="Nomor Telepon (Require)" value="{{ old('phone') }}">
+                <label for="phone">Nomor Telepon</label>
                 @error('phone')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
@@ -75,8 +75,8 @@
             </div>
 
             <div class="form-floating mb-3">
-                <textarea class="form-control @error('address') is-invalid @enderror" id="address" name="address" placeholder="Alamat Lengkap (Opsional)" style="height: 100px">{{ old('address') }}</textarea>
-                <label for="address">Alamat Lengkap (Opsional)</label>
+                <textarea class="form-control @error('address') is-invalid @enderror" id="address" name="address" placeholder="Alamat" style="height: 100px">{{ old('address') }}</textarea>
+                <label for="address">Alamat</label>
                  @error('address')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
