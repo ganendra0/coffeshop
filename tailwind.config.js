@@ -9,15 +9,15 @@ export default {
   theme: {
     extend: {
       colors: {
-        'primary': '#c49b63', // Warna utama dari template Anda
-        'darken': '#151111',
+        primary: "#c49b63", // Warna utama dari template Anda
+        darken: "#151111", // Contoh warna gelap dari template Anda
       },
       fontFamily: {
-        'poppins': ['Poppins', 'sans-serif'],
-        'josefin': ['"Josefin Sans"', 'sans-serif'],
-        'great-vibes': ['"Great Vibes"', 'cursive'],
-      }
+        poppins: ["Poppins", "sans-serif"],
+        josefin: ['"Josefin Sans"', "sans-serif"],
+        "great-vibes": ['"Great Vibes"', "cursive"],
+      },
     },
   },
   plugins: [],
-}
+};

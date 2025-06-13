@@ -43,7 +43,7 @@ Route::prefix('v1')->group(function () {
     Route::apiResource('menus', MenuController::class); // Menu bisa dilihat publik
 
     // Resource yang biasanya memerlukan autentikasi user
-    Route::middleware('auth:sanctum')->group(function() {
+        Route::middleware('auth:sanctum')->group(function() {
         Route::apiResource('orders', OrderController::class);
         Route::apiResource('order-items', OrderItemController::class);
         Route::apiResource('payments', PaymentController::class);

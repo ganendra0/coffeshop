@@ -4,7 +4,12 @@
 
 @section('content')
 
+@vite(['resources/css/app.css', 'resources/js/app.js'])
+
+
 {{-- Hero Section --}}
+    @yield('content')
+
 <section class="h-[600px] relative">
     <div class="h-full bg-cover bg-center" style="background-image: url({{ asset('images/bg_3.jpg') }});">
         <div class="absolute inset-0 bg-black opacity-30"></div>

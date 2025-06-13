@@ -3,3 +3,24 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Opsional: Import Font Awesome jika Anda butuh ikon */
+/* Anda perlu menginstal @fortawesome/fontawesome-free via npm */
+@import '@fortawesome/fontawesome-free/css/all.min.css';
+
+/* Tambahkan CSS kustom Anda di sini jika ada */
+/* Contoh: Mendefinisikan ulang kelas untuk typography atau komponen custom */
+.bread {
+    font-family: 'Josefin Sans', sans-serif;
+    /* Menggunakan font dari extend Tailwind */
+    /* Tambahkan style kustom lain jika diperlukan */
+}
+
+.breadcrumbs span.mr-2 a {
+    @apply text-primary hover:text-white transition duration-300;
+    /* Contoh apply Tailwind utilities */
+}
+
+/* Jika Anda punya kelas dari template lama yang masih ingin dipertahankan,
+   misalnya kelas untuk footer atau navigasi yang tidak bisa sepenuhnya diganti Tailwind,
+   Anda bisa menaruhnya di sini. Namun, idealnya semua diubah ke Tailwind. */

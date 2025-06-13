@@ -29,8 +29,6 @@
                 <h1 class="h3 mb-3 fw-normal">Silakan Login</h1>
             </div>
 
-            @include('partials.alerts') {{-- Jika Anda menggunakan partial alerts --}}
-            {{-- Atau jika error validasi login spesifik ditampilkan di sini: --}}
             {{-- @if ($errors->any())
                 <div class="alert alert-danger">
                     <ul class="mb-0">
