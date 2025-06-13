@@ -1,3 +1,4 @@
+{{-- resources/views/pages/index.blade.php --}}
 @extends('layouts.app')
 
 @section('title', 'Coffee Blend - Home')
@@ -13,11 +14,13 @@
             <div class="flex h-full items-center justify-center">
                 <div class="w-full max-w-3xl text-center text-white">
                     <span class="font-great-vibes text-3xl text-primary">Welcome</span>
-                    <h1 class="mb-4 text-4xl uppercase tracking-wider">The Best Coffee Testing Experience</h1>
-                    <p class="mb-4 md:mb-5 text-lg font-light text-white">A small river named Duden flows by their place and supplies it with the necessary regelialia.</p>
-                    <p>
-                        <a href="#" class="btn btn-primary p-3 px-4">Order Now</a> 
-                        <a href="#" class="btn btn-white btn-outline-white p-3 px-4">View Menu</a>
+                    <h1 class="mb-4 text-4xl uppercase tracking-wider font-josefin">The Best Coffee Testing Experience</h1> {{-- Menambahkan font-josefin --}}
+                    <p class="mb-4 md:mb-5 text-lg font-light text-white leading-relaxed">A small river named Duden flows by their place and supplies it with the necessary regelialia.</p>
+                    <p class="space-x-4"> {{-- Menambahkan space-x untuk jarak antar tombol --}}
+                        {{-- Mengganti btn btn-primary --}}
+                        <a href="#" class="bg-primary text-white py-3 px-6 rounded-full hover:bg-opacity-90 transition duration-300 text-lg font-semibold">Order Now</a>
+                        {{-- Mengganti btn btn-white btn-outline-white --}}
+                        <a href="#" class="border border-white text-white py-3 px-6 rounded-full hover:bg-white hover:text-black transition duration-300 text-lg font-semibold">View Menu</a>
                     </p>
                 </div>
             </div>
@@ -29,35 +32,35 @@
 {{-- Konversi dari ftco-intro --}}
 <section class="-mt-[130px] relative z-20">
     <div class="container mx-auto px-4">
-        <div class="md:flex items-end">
-            <div class="bg-black p-8 md:w-2/3">
-                <div class="grid md:grid-cols-3 gap-4">
-                    <div class="flex items-start">
-                        <div class="text-primary text-2xl mr-4"><span class="icon-phone"></span></div>
+        <div class="md:flex items-end shadow-lg rounded-lg overflow-hidden"> {{-- Menambahkan shadow dan rounded untuk kontainer --}}
+            <div class="bg-black p-8 md:w-2/3 text-gray-400"> {{-- Menambahkan warna teks --}}
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="flex items-start space-x-4"> {{-- Menambahkan space-x --}}
+                        <div class="text-primary text-3xl"><i class="fas fa-phone"></i></div> {{-- Mengganti icon-phone dengan Font Awesome --}}
                         <div>
-                            <h3 class="text-white text-base">000 (123) 456 7890</h3>
-                            <p>A small river named Duden flows by their place and supplies.</p>
+                            <h3 class="text-white text-lg font-semibold">000 (123) 456 7890</h3>
+                            <p class="text-sm">A small river named Duden flows by their place and supplies.</p>
                         </div>
                     </div>
-                    <div class="flex items-start">
-                        <div class="text-primary text-2xl mr-4"><span class="icon-my_location"></span></div>
+                    <div class="flex items-start space-x-4">
+                        <div class="text-primary text-3xl"><i class="fas fa-map-marker-alt"></i></div> {{-- Mengganti icon-my_location dengan Font Awesome --}}
                         <div>
-                            <h3 class="text-white text-base">198 West 21th Street</h3>
-                            <p>203 Fake St. Mountain View, San Francisco, California, USA</p>
+                            <h3 class="text-white text-lg font-semibold">198 West 21th Street</h3>
+                            <p class="text-sm">203 Fake St. Mountain View, San Francisco, California, USA</p>
                         </div>
                     </div>
-                     <div class="flex items-start">
-                        <div class="text-primary text-2xl mr-4"><span class="icon-clock-o"></span></div>
+                     <div class="flex items-start space-x-4">
+                        <div class="text-primary text-3xl"><i class="far fa-clock"></i></div> {{-- Mengganti icon-clock-o dengan Font Awesome --}}
                         <div>
-                            <h3 class="text-white text-base">Open Monday-Friday</h3>
-                            <p>8:00am - 9:00pm</p>
+                            <h3 class="text-white text-lg font-semibold">Open Monday-Friday</h3>
+                            <p class="text-sm">8:00am - 9:00pm</p>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="bg-primary p-4 md:w-1/3">
-                <h3 class="text-black uppercase">Book a Table</h3>
-                {{-- Form Booking Table --}}
+            <div class="bg-primary p-4 md:w-1/3 flex items-center justify-center py-8"> {{-- Menambahkan flex dan py untuk mengisi ruang --}}
+                <h3 class="text-black uppercase text-2xl font-bold">Book a Table</h3>
+                {{-- Form Booking Table (Anda perlu mengkonversinya ke Tailwind juga jika ada) --}}
             </div>
         </div>
     </div>
@@ -65,5 +68,7 @@
 
 
 {{-- Dan seterusnya untuk section lainnya... --}}
+{{-- Anda perlu mengkonversi section-section lain di index.blade.php dengan pola yang sama --}}
+{{-- Misalnya untuk "Our Story", "Discover Menu", "Testimony", dll. --}}
 
 @endsection
