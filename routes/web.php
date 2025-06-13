@@ -20,6 +20,11 @@ use Illuminate\Support\Facades\Hash; // Import Hash untuk registrasi
 |--------------------------------------------------------------------------
 | Web Routes
 |--------------------------------------------------------------------------
+|
+| Here is where you can register web routes for your application. These
+| routes are loaded by the RouteServiceProvider within a group which
+| contains the "web" middleware group. Now create something great!
+|
 */
 
 // --- Rute Halaman Publik (Tidak Perlu Login) ---
@@ -29,6 +34,14 @@ Route::get('/menu', [PageController::class, 'menu'])->name('menu');
 Route::get('/services', [PageController::class, 'services'])->name('services');
 Route::get('/blog', [PageController::class, 'blog'])->name('blog');
 Route::get('/contact', [PageController::class, 'contact'])->name('contact');
+
+// Tambahkan rute untuk halaman-halaman lain dari template Cafe Anda
+Route::get('/blog-single', [PageController::class, 'blogSingle'])->name('blog-single');
+Route::get('/cart', [PageController::class, 'cart'])->name('cart');
+Route::get('/checkout', [PageController::class, 'checkout'])->name('checkout');
+Route::get('/shop', [PageController::class, 'shop'])->name('shop');
+Route::get('/product-single', [PageController::class, 'productSingle'])->name('product-single');
+
 
 // --- Rute Autentikasi ---
 
@@ -50,7 +63,7 @@ Route::middleware('guest')->group(function () {
             $request->session()->regenerate();
             // Arahkan ke dashboard setelah login berhasil
             // Jika Anda punya route 'dashboard', gunakan itu. Jika tidak, users.index juga boleh.
-            return redirect()->intended(route('users.index'));
+            return redirect()->intended(route('users.index')); // Asumsi 'users.index' adalah dashboard default
         }
 
         return back()->withErrors([
