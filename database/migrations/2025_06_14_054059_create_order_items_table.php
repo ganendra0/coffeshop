@@ -9,15 +9,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('order_items', function (Blueprint $table) {
-            $table->bigIncrements('item_id');
+            $table->id('order_item_id'); // Primary key kustom
             $table->unsignedBigInteger('order_id');
             $table->unsignedBigInteger('menu_id');
             $table->integer('quantity');
+            $table->decimal('price_at_order', 10, 2); // Penting untuk menyimpan harga saat itu
             $table->text('notes')->nullable();
-            $table->timestamps(); // Umumnya item juga punya created/updated
-
-            $table->foreign('order_id')->references('order_id')->on('orders')->onDelete('cascade');
-            $table->foreign('menu_id')->references('menu_id')->on('menus')->onDelete('restrict'); // Restrict agar menu tidak bisa dihapus jika ada order item
+            $table->timestamps();
         });
     }
 

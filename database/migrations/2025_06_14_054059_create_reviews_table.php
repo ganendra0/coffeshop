@@ -9,14 +9,14 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('reviews', function (Blueprint $table) {
-            $table->bigIncrements('review_id');
+            $table->id('review_id'); // Primary key kustom
             $table->unsignedBigInteger('order_id');
-            $table->tinyInteger('rating'); // 1-5
+            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('menu_id');
+            $table->integer('rating');
             $table->text('comment')->nullable();
-            $table->timestamp('created_at')->useCurrent();
-            // $table->timestamp('updated_at')->nullable(); // Jika review bisa diedit
-
-            $table->foreign('order_id')->references('order_id')->on('orders')->onDelete('cascade');
+            $table->boolean('is_anonymous')->default(false);
+            $table->timestamps();
         });
     }
 

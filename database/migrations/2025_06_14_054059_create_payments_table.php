@@ -9,15 +9,15 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('payments', function (Blueprint $table) {
-            $table->bigIncrements('payment_id');
+            $table->id('payment_id'); // Primary key kustom
             $table->unsignedBigInteger('order_id');
+            $table->unsignedBigInteger('user_id');
             $table->decimal('amount', 10, 2);
-            $table->string('status', 20)->default('pending');
-            $table->string('payment_proof', 255)->nullable();
+            $table->string('payment_method', 50);
+            $table->string('payment_gateway_reference', 255)->nullable(); // Misal untuk id transaksi dari Midtrans/Stripe
+            $table->string('status', 30);
             $table->timestamp('payment_time')->nullable();
-            $table->timestamps(); // Record creation/update time for this payment entry
-
-            $table->foreign('order_id')->references('order_id')->on('orders')->onDelete('cascade');
+            $table->timestamps();
         });
     }
 

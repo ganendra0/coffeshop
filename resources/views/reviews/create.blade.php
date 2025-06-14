@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.admin')
 
 @section('title', $selectedOrderId ? 'Tambah Review Order #' . $selectedOrderId : 'Tambah Review Baru')
 

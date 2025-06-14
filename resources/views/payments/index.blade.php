@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.admin')
 
 {{-- Definisikan variabel untuk judul berdasarkan filter saat ini --}}
 @php

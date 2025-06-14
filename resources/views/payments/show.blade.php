@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.admin')
 
 @section('title', 'Detail Pembayaran Order #' . $payment->order_id)
 

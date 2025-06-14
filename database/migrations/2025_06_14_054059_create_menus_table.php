@@ -9,13 +9,14 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('menus', function (Blueprint $table) {
-            $table->bigIncrements('menu_id');
-            $table->string('name', 100);
+            $table->id('menu_id'); // Primary key kustom
+            $table->string('name', 150);
+            $table->text('description')->nullable();
             $table->decimal('price', 10, 2);
-            $table->string('category', 30);
-            $table->integer('stock');
-            $table->boolean('is_available')->default(true);
+            $table->string('category', 50)->nullable();
             $table->string('image_url', 255)->nullable();
+            $table->integer('stock')->default(0);
+            $table->boolean('is_available')->default(true);
             $table->timestamps();
         });
     }

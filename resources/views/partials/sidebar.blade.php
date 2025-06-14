@@ -40,26 +40,6 @@
         Reviews
     </a>
 </li>
-<li class="nav-item">
-    <a class="nav-link {{ request()->routeIs('notifications.*') ? 'active' : '' }}" href="{{ route('notifications.index') }}">
-        <i class="fas fa-bell fa-fw me-2"></i>
-        Notifications
-    </a>
-</li>
-<li class="nav-item">
-    <a class="nav-link {{ request()->routeIs('drivers.*') ? 'active' : '' }}" href="{{ route('drivers.index') }}">
-        <i class="fas fa-shipping-fast fa-fw me-2"></i> {{-- Atau ikon lain seperti fa-id-card, fa-motorcycle --}}
-        Drivers
-    </a>
-</li>
-{{-- ... Menu Drivers ... --}}
-<li class="nav-item">
-    <a class="nav-link {{ request()->routeIs('deliveries.*') ? 'active' : '' }}" href="{{ route('deliveries.index') }}">
-        <i class="fas fa-truck fa-fw me-2"></i>
-        Deliveries
-    </a>
-</li>
-{{-- ... Menu lainnya ... --}}
         </ul>
 
         <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted text-uppercase">

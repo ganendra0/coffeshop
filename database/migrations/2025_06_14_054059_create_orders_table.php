@@ -9,19 +9,16 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('orders', function (Blueprint $table) {
-            $table->bigIncrements('order_id');
-            $table->unsignedBigInteger('user_id')->nullable(); // Sesuai definisi FK
+            $table->id('order_id'); // Primary key kustom
+            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('payment_id')->nullable(); // Dibuat nullable karena payment bisa dibuat setelah order
             $table->enum('order_type', ['pickup', 'delivery']);
-            $table->string('status', 20)->default('pending');
+            $table->string('status', 50);
             $table->decimal('total_price', 10, 2);
-            $table->string('payment_method', 20);
             $table->text('delivery_address')->nullable();
-            // $table->timestamp('created_at')->useCurrent(); // Sesuai skema
-            // $table->timestamp('updated_at')->nullable(); // Jika ingin konsisten
+            $table->timestamp('estimated_delivery_time')->nullable();
+            $table->text('notes_for_restaurant')->nullable();
             $table->timestamps();
-
-
-            $table->foreign('user_id')->references('user_id')->on('users')->onDelete('set null');
         });
     }
 
