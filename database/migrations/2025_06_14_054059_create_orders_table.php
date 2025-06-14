@@ -12,7 +12,6 @@ return new class extends Migration
             $table->id('order_id'); // Primary key kustom
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('payment_id')->nullable(); // Dibuat nullable karena payment bisa dibuat setelah order
-            $table->enum('order_type', ['pickup', 'delivery']);
             $table->string('status', 50);
             $table->decimal('total_price', 10, 2);
             $table->text('delivery_address')->nullable();

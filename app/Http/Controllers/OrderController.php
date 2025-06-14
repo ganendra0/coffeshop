@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
-use App\Models\User; // Untuk mengambil daftar user
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
@@ -16,7 +16,7 @@ class OrderController extends Controller
     public function index()
     {
         $orders = Order::with('user')->latest()->paginate(10);
-        return view('orders.index', compact('orders'));
+        return view('admin.orders.index', compact('orders'));
     }
 
     /**
@@ -24,13 +24,11 @@ class OrderController extends Controller
      */
     public function create()
     {
-        $users = User::orderBy('name')->get(); // Ambil semua user untuk dropdown
-        $orderTypes = Order::getOrderTypes();
+        // HANYA MENGIRIM DATA YANG DIPERLUKAN
+        $users = User::orderBy('name')->get();
         $statuses = Order::getStatuses();
-        // Contoh metode pembayaran
-        $paymentMethods = ['Cash', 'Debit Card', 'Credit Card', 'E-Wallet'];
 
-        return view('orders.create', compact('users', 'orderTypes', 'statuses', 'paymentMethods'));
+        return view('admin.orders.create', compact('users', 'statuses'));
     }
 
     /**
@@ -38,13 +36,12 @@ class OrderController extends Controller
      */
     public function store(Request $request)
     {
+        // VALIDASI TANPA ORDER_TYPE DAN DELIVERY_ADDRESS
         $validator = Validator::make($request->all(), [
-            'user_id' => 'nullable|exists:users,user_id', // user_id boleh null, tapi jika diisi harus ada di tabel users
-            'order_type' => ['required', Rule::in(array_keys(Order::getOrderTypes()))],
+            'user_id' => 'nullable|exists:users,user_id',
             'status' => ['required', Rule::in(array_keys(Order::getStatuses()))],
             'total_price' => 'required|numeric|min:0',
-            'payment_method' => 'required|string|max:20',
-            'delivery_address' => 'nullable|string|required_if:order_type,'.Order::TYPE_DELIVERY, // Wajib jika order_type = delivery
+            'notes_for_restaurant' => 'nullable|string',
         ]);
 
         if ($validator->fails()) {
@@ -53,55 +50,45 @@ class OrderController extends Controller
                         ->withInput();
         }
 
-        Order::create($request->all());
+        $data = $request->only(['user_id', 'status', 'total_price', 'notes_for_restaurant']);
+        // Menetapkan nilai default untuk order_type jika kolomnya masih ada di DB
+        $data['order_type'] = 'pickup'; // Atau nilai default apapun
+
+        Order::create($data);
 
         return redirect()->route('orders.index')->with('success', 'Order baru berhasil dibuat.');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Order $order_id) // Route Model Binding
-    {
-        // Eager load user dan items jika ada
-        $order_id->load('user', 'items');
-        return view('orders.show', ['order' => $order_id]);
-    }
+    // ... method show, edit, update, destroy juga perlu disederhanakan ...
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Order $order_id) // Route Model Binding
+    public function edit(Order $order)
     {
+        // HANYA MENGIRIM DATA YANG DIPERLUKAN
         $users = User::orderBy('name')->get();
-        $orderTypes = Order::getOrderTypes();
         $statuses = Order::getStatuses();
-        $paymentMethods = ['Cash', 'Debit Card', 'Credit Card', 'E-Wallet'];
 
-        return view('orders.edit', compact('order', 'users', 'orderTypes', 'statuses', 'paymentMethods'));
+        return view('admin.orders.edit', compact('order', 'users', 'statuses'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Order $order_id) // Route Model Binding
+
+    public function update(Request $request, Order $order)
     {
+        // VALIDASI TANPA ORDER_TYPE DAN DELIVERY_ADDRESS
         $validator = Validator::make($request->all(), [
             'user_id' => 'nullable|exists:users,user_id',
-            'order_type' => ['required', Rule::in(array_keys(Order::getOrderTypes()))],
             'status' => ['required', Rule::in(array_keys(Order::getStatuses()))],
             'total_price' => 'required|numeric|min:0',
-            'payment_method' => 'required|string|max:20',
-            'delivery_address' => 'nullable|string|required_if:order_type,'.Order::TYPE_DELIVERY,
+            'notes_for_restaurant' => 'nullable|string',
         ]);
 
         if ($validator->fails()) {
-            return redirect()->route('orders.edit', $order_id->order_id)
+            return redirect()->route('orders.edit', $order->order_id)
                         ->withErrors($validator)
                         ->withInput();
         }
 
-        $order_id->update($request->all());
+        $data = $request->only(['user_id', 'status', 'total_price', 'notes_for_restaurant']);
+        $order->update($data);
 
         return redirect()->route('orders.index')->with('success', 'Data order berhasil diperbarui.');
     }
@@ -109,13 +96,13 @@ class OrderController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Order $order_id) // Route Model Binding
+    public function destroy(Order $order)
     {
-        // Tambahkan logika jika order punya item, mungkin tidak boleh dihapus langsung
-        // if ($order_id->items && $order_id->items()->count() > 0) {
-        //     return redirect()->route('orders.index')->with('error', 'Order tidak bisa dihapus karena memiliki item.');
-        // }
-        $order_id->delete();
-        return redirect()->route('orders.index')->with('success', 'Order berhasil dihapus.');
+        if ($order->orderItems()->count() > 0) {
+            return redirect()->route('admin.orders.index')->with('error', 'Order tidak bisa dihapus karena memiliki item pesanan.');
+        }
+
+        $order->delete();
+        return redirect()->route('admin.orders.index')->with('success', 'Order berhasil dihapus.');
     }
 }

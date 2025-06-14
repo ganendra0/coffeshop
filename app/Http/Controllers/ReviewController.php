@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Review;
 use App\Models\Order;
+use App\Models\User;
+use App\Models\Menu;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -14,35 +16,29 @@ class ReviewController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Review::with(['order.user'])->latest('created_at'); // Eager load order dan user
+        // DIPERBAIKI: Eager load relasi yang benar (user, menu)
+        $query = Review::with(['user', 'menu', 'order'])->latest('created_at');
 
-        if ($request->has('order_id') && $request->order_id != '') {
-            $query->where('order_id', $request->order_id);
-        }
-        if ($request->has('rating') && $request->rating != '') {
+        if ($request->filled('rating')) {
             $query->where('rating', $request->rating);
         }
 
         $reviews = $query->paginate(15);
-        $orders = Order::orderBy('order_id', 'desc')->get(); // Untuk filter
-
-        return view('reviews.index', compact('reviews', 'orders'));
+        return view('admin.reviews.index', compact('reviews'));
     }
 
     /**
      * Show the form for creating a new resource.
-     * Review biasanya dibuat dari sisi pengguna setelah order selesai.
-     * Untuk admin, ini mungkin tidak terlalu umum, tapi kita buatkan.
      */
-    public function create(Request $request)
+    public function create()
     {
-        // Hanya order yang sudah selesai dan belum ada review
-        $orders = Order::where('status', Order::STATUS_COMPLETED)
-                        ->whereDoesntHave('review')
-                        ->orderBy('order_id', 'desc')->get();
-        $selectedOrderId = $request->input('order_id');
+        // BARU: Kita butuh daftar User, Menu, dan Order untuk form
+        $users = User::orderBy('name')->get();
+        $menus = Menu::orderBy('name')->get();
+        $orders = Order::orderBy('order_id', 'desc')->get();
 
-        return view('reviews.create', compact('orders', 'selectedOrderId'));
+        // DIPERBAIKI: Mengarahkan ke view admin dan mengirim semua data yang dibutuhkan
+        return view('admin.reviews.create', compact('users', 'menus', 'orders'));
     }
 
     /**
@@ -50,74 +46,96 @@ class ReviewController extends Controller
      */
     public function store(Request $request)
     {
+        // DIPERBAIKI: Validasi disesuaikan dengan skema baru
         $validator = Validator::make($request->all(), [
-            'order_id' => 'required|exists:orders,order_id|unique:reviews,order_id', // Satu review per order
-            'rating' => 'required|integer|min:1|max:5', // Asumsi rating 1-5
+            'order_id' => 'required|exists:orders,order_id',
+            'user_id' => 'required|exists:users,user_id',
+            'menu_id' => 'required|exists:menus,menu_id',
+            'rating' => 'required|integer|min:1|max:5',
             'comment' => 'nullable|string|max:1000',
-        ], [
-            'order_id.unique' => 'Order ini sudah memiliki review.',
+            'is_anonymous' => 'sometimes|boolean',
         ]);
 
         if ($validator->fails()) {
-            return redirect()->route('reviews.create', ['order_id' => $request->order_id])
+            // DIPERBAIKI: Mengarahkan ke route admin
+            return redirect()->route('admin.reviews.create')
                         ->withErrors($validator)
                         ->withInput();
         }
 
-        Review::create($request->all());
+        $data = $request->all();
+        // Pastikan is_anonymous punya nilai default jika tidak dicentang
+        $data['is_anonymous'] = $request->has('is_anonymous') ? 1 : 0;
 
-        return redirect()->route('reviews.index')->with('success', 'Review berhasil ditambahkan.');
+        Review::create($data);
+
+        return redirect()->route('admin.reviews.index')->with('success', 'Review berhasil ditambahkan.');
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Review $review) // Route model binding
+    public function show(Review $review) // Route model binding sudah benar
     {
-        $review->load(['order.user']);
-        return view('reviews.show', compact('review'));
+        // DIPERBAIKI: Eager load relasi yang relevan
+        $review->load(['order', 'user', 'menu']);
+        // DIPERBAIKI: Mengarahkan ke view admin
+        return view('admin.reviews.show', compact('review'));
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Review $review)
+    public function edit(Review $review) // Route model binding sudah benar
     {
-        $review->load('order');
-        // Order ID biasanya tidak diubah
-        $orders = Order::where('order_id', $review->order_id)->get();
+        $review->load(['order', 'user', 'menu']);
+        
+        // BARU: Kirim semua data yang mungkin diubah
+        $users = User::orderBy('name')->get();
+        $menus = Menu::orderBy('name')->get();
+        $orders = Order::orderBy('order_id', 'desc')->get();
 
-        return view('reviews.edit', compact('review', 'orders'));
+        // DIPERBAIKI: Mengarahkan ke view admin
+        return view('admin.reviews.edit', compact('review', 'users', 'menus', 'orders'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Review $review)
+    public function update(Request $request, Review $review) // Route model binding sudah benar
     {
+        // DIPERBAIKI: Validasi disesuaikan dengan skema baru
         $validator = Validator::make($request->all(), [
-            // order_id tidak boleh diubah
+            'order_id' => 'required|exists:orders,order_id',
+            'user_id' => 'required|exists:users,user_id',
+            'menu_id' => 'required|exists:menus,menu_id',
             'rating' => 'required|integer|min:1|max:5',
             'comment' => 'nullable|string|max:1000',
+            'is_anonymous' => 'sometimes|boolean',
         ]);
 
         if ($validator->fails()) {
-            return redirect()->route('reviews.edit', $review->review_id)
+            // DIPERBAIKI: Mengarahkan ke route admin
+            return redirect()->route('admin.reviews.edit', $review->review_id)
                         ->withErrors($validator)
                         ->withInput();
         }
+        
+        $data = $request->all();
+        $data['is_anonymous'] = $request->has('is_anonymous') ? 1 : 0;
 
-        $review->update($request->only(['rating', 'comment']));
+        $review->update($data);
 
-        return redirect()->route('reviews.index')->with('success', 'Review berhasil diperbarui.');
+        return redirect()->route('admin.reviews.index')->with('success', 'Review berhasil diperbarui.');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Review $review)
+    public function destroy(Review $review) // Route model binding sudah benar
     {
         $review->delete();
-        return redirect()->route('reviews.index')->with('success', 'Review berhasil dihapus.');
+        // Route sudah benar
+        return redirect()->route('admin.reviews.index')->with('success', 'Review berhasil dihapus.');
     }
 }

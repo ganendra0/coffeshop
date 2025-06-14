@@ -45,11 +45,11 @@
                             <td>{{ $menu->menu_id }}</td>
                             <td>
                                 @if($menu->full_image_url)
-                                    <img src="{{ $menu->full_image_url }}" alt="{{ $menu->name }}" width="80" class="img-thumbnail">
+                                    <img src="{{ $menu->full_image_url }}" alt="{{ $menu->name }}" width="80">
                                 @else
                                     {{-- Tampilkan placeholder atau teks jika tidak ada gambar --}}
-                                    <img src="{{ asset('images/placeholder_menu.png') }}" alt="No Image" width="80" class="img-thumbnail">
-                                    {{-- Atau: <span class="text-muted">N/A</span> --}}
+                                    {{-- <img src="{{ asset('images/placeholder_menu.png') }}" alt="No Image" width="80" class="img-thumbnail"> --}}
+                                    <span class="text-muted">N/A</span>
                                 @endif
                             </td>
                             <td>{{ $menu->name }}</td>

@@ -36,7 +36,6 @@
                         <tr>
                             <th>ID</th>
                             <th>Pelanggan</th>
-                            <th>Tipe</th>
                             <th>Status</th>
                             <th>Total (Rp)</th>
                             <th>Metode Bayar</th>
@@ -50,16 +49,10 @@
                             <td>#{{ $order->order_id }}</td>
                             <td>{{ $order->user ? $order->user->name : 'N/A' }}</td>
                             <td>
-                                <span class="badge bg-{{ $order->order_type == App\Models\Order::TYPE_DELIVERY ? 'info' : 'secondary' }}">
-                                    {{ ucfirst($order->order_type) }}
-                                </span>
-                            </td>
-                            <td>
                                 @php
                                     $statusClass = 'secondary';
                                     if ($order->status == App\Models\Order::STATUS_PENDING) $statusClass = 'warning text-dark';
                                     if ($order->status == App\Models\Order::STATUS_PROCESSING) $statusClass = 'primary';
-                                    if ($order->status == App\Models\Order::STATUS_DELIVERING) $statusClass = 'info';
                                     if ($order->status == App\Models\Order::STATUS_COMPLETED) $statusClass = 'success';
                                     if ($order->status == App\Models\Order::STATUS_CANCELLED) $statusClass = 'danger';
                                 @endphp

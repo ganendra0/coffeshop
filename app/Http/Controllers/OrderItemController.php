@@ -12,44 +12,35 @@ class OrderItemController extends Controller
 {
     /**
      * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
      */
     public function index(Request $request)
     {
-        $query = OrderItem::with(['order', 'menu'])->latest();
+        $query = OrderItem::with(['order.user', 'menu'])->latest();
 
-        // Filter berdasarkan Order ID jika ada parameter di URL
-        if ($request->has('order_id') && $request->order_id != '') {
+        if ($request->filled('order_id')) {
             $query->where('order_id', $request->order_id);
         }
 
         $orderItems = $query->paginate(15);
-        $orders = Order::orderBy('order_id', 'desc')->get(); // Untuk filter dropdown
+        $orders = Order::orderBy('order_id', 'desc')->get();
 
-        return view('order_items.index', compact('orderItems', 'orders'));
+        return view('admin.order_items.index', compact('orderItems', 'orders'));
     }
 
     /**
      * Show the form for creating a new resource.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
      */
     public function create(Request $request)
     {
-        $orders = Order::orderBy('order_id', 'desc')->get(); // Untuk memilih order
-        $menus = Menu::where('is_available', true)->orderBy('name')->get(); // Hanya menu yang tersedia
-        $selectedOrderId = $request->input('order_id'); // Untuk pre-select jika datang dari halaman order
+        $orders = Order::orderBy('order_id', 'desc')->get();
+        $menus = Menu::where('is_available', true)->orderBy('name')->get();
+        $selectedOrderId = $request->input('order_id');
 
-        return view('order_items.create', compact('orders', 'menus', 'selectedOrderId'));
+        return view('admin.order_items.create', compact('orders', 'menus', 'selectedOrderId'));
     }
 
     /**
      * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
     {
@@ -58,135 +49,120 @@ class OrderItemController extends Controller
             'menu_id' => 'required|exists:menus,menu_id',
             'quantity' => 'required|integer|min:1',
             'notes' => 'nullable|string',
-            // 'price_at_order' => 'required|numeric|min:0', // Jika Anda menambahkan kolom ini
         ]);
 
         if ($validator->fails()) {
+            // DIPERBAIKI: Menghapus prefix 'admin.'
             return redirect()->route('order_items.create', ['order_id' => $request->order_id])
                         ->withErrors($validator)
                         ->withInput();
         }
 
-        $data = $request->all();
-        // Jika Anda mau menyimpan harga saat ini dari menu:
-        // $menu = Menu::find($request->menu_id);
-        // if ($menu) {
-        //     $data['price_at_order'] = $menu->price;
-        // }
+        try {
+            $menu = Menu::findOrFail($request->menu_id);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return redirect()->back()->with('error', 'Menu yang dipilih tidak valid.')->withInput();
+        }
+
+        $data = $request->only(['order_id', 'menu_id', 'quantity', 'notes']);
+        $data['price_at_order'] = $menu->price;
 
         OrderItem::create($data);
 
-        // Opsional: Update total_price di Order induk setelah item ditambahkan
-        // $this->updateOrderTotalPrice($request->order_id);
+        $this->updateOrderTotalPrice($request->order_id);
 
-        return redirect()->route('order_items.index', ['order_id' => $request->order_id])->with('success', 'Item berhasil ditambahkan ke order.');
+        // DIPERBAIKI: Menghapus prefix 'admin.'
+        return redirect()->route('order_items.index', ['order_id' => $request->order_id])
+            ->with('success', 'Item berhasil ditambahkan ke pesanan.');
     }
 
     /**
      * Display the specified resource.
-     * (Biasanya tidak terlalu dibutuhkan untuk OrderItem standalone)
-     *
-     * @param  \App\Models\OrderItem  $orderItem_id (gunakan nama parameter sesuai route:list)
-     * @return \Illuminate\Http\Response
      */
-    public function show(OrderItem $order_item) // Ganti $orderItem_id menjadi $order_item jika menggunakan route model binding dengan nama parameter 'order_item'
+    public function show(OrderItem $order_item)
     {
         $order_item->load(['order', 'menu']);
-        return view('order_items.show', compact('order_item'));
+        return view('admin.order_items.show', compact('order_item'));
     }
 
     /**
      * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\OrderItem  $orderItem_id
-     * @return \Illuminate\Http\Response
      */
     public function edit(OrderItem $order_item)
     {
-        $order_item->load('order'); // Perlu order untuk konteks
+        $order_item->load('order');
         $orders = Order::orderBy('order_id', 'desc')->get();
-        $menus = Menu::where('is_available', true)->orderBy('name')->get();
+        $menus = Menu::orderBy('name')->get();
 
-        return view('order_items.edit', compact('order_item', 'orders', 'menus'));
+        return view('admin.order_items.edit', compact('order_item', 'orders', 'menus'));
     }
 
     /**
      * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\OrderItem  $orderItem_id
-     * @return \Illuminate\Http\Response
      */
     public function update(Request $request, OrderItem $order_item)
     {
         $validator = Validator::make($request->all(), [
-            'order_id' => 'required|exists:orders,order_id', // Seharusnya tidak diubah, tapi untuk validasi
+            'order_id' => 'required|exists:orders,order_id',
             'menu_id' => 'required|exists:menus,menu_id',
             'quantity' => 'required|integer|min:1',
             'notes' => 'nullable|string',
-            // 'price_at_order' => 'required|numeric|min:0',
         ]);
 
         if ($validator->fails()) {
-            return redirect()->route('order_items.edit', $order_item->item_id)
+            // DIPERBAIKI: Menghapus prefix 'admin.'
+            return redirect()->route('order_items.edit', $order_item->order_item_id)
                         ->withErrors($validator)
                         ->withInput();
         }
 
-        $data = $request->all();
-        // Jika Anda mau menyimpan harga saat ini dari menu (jika menu diubah):
-        // if ($order_item->menu_id != $request->menu_id || !$order_item->price_at_order) {
-        //     $menu = Menu::find($request->menu_id);
-        //     if ($menu) {
-        //         $data['price_at_order'] = $menu->price;
-        //     }
-        // }
+        try {
+            $menu = Menu::findOrFail($request->menu_id);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return redirect()->back()->with('error', 'Menu yang dipilih tidak valid.')->withInput();
+        }
+
+        $data = $request->only(['order_id', 'menu_id', 'quantity', 'notes']);
+        $data['price_at_order'] = $menu->price;
 
         $order_item->update($data);
 
-        // Opsional: Update total_price di Order induk setelah item diubah
-        // $this->updateOrderTotalPrice($order_item->order_id);
+        $this->updateOrderTotalPrice($order_item->order_id);
 
-
-        return redirect()->route('order_items.index', ['order_id' => $order_item->order_id])->with('success', 'Item order berhasil diperbarui.');
+        // DIPERBAIKI: Menghapus prefix 'admin.'
+        return redirect()->route('order_items.index', ['order_id' => $order_item->order_id])
+            ->with('success', 'Item pesanan berhasil diperbarui.');
     }
 
     /**
      * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\OrderItem  $orderItem_id
-     * @return \Illuminate\Http\Response
      */
     public function destroy(OrderItem $order_item)
     {
-        $orderId = $order_item->order_id; // Simpan order_id sebelum dihapus
+        $orderId = $order_item->order_id;
         $order_item->delete();
 
-        // Opsional: Update total_price di Order induk setelah item dihapus
-        // $this->updateOrderTotalPrice($orderId);
+        if ($orderId) {
+            $this->updateOrderTotalPrice($orderId);
+        }
 
-        return redirect()->route('order_items.index', ['order_id' => $orderId])->with('success', 'Item order berhasil dihapus.');
+        return redirect()->back()->with('success', 'Item pesanan berhasil dihapus.');
     }
 
     /**
-     * Helper function to update total_price in the parent Order.
-     * (Panggil ini setelah store, update, destroy OrderItem jika diperlukan)
+     * Helper function untuk mengkalkulasi ulang total harga di Order induk.
      */
-    // protected function updateOrderTotalPrice($orderId)
-    // {
-    //     $order = Order::with('items')->find($orderId);
-    //     if ($order) {
-    //         $totalPrice = 0;
-    //         foreach ($order->items as $item) {
-    //             // Asumsi Anda memiliki 'price_at_order' di OrderItem atau mengambil dari Menu
-    //             // Jika pakai price_at_order di OrderItem:
-    //             // $subtotal = $item->quantity * $item->price_at_order;
-    //             // Jika ambil dari Menu (harga bisa berubah):
-    //             $subtotal = $item->menu ? ($item->quantity * $item->menu->price) : 0;
-    //             $totalPrice += $subtotal;
-    //         }
-    //         $order->total_price = $totalPrice;
-    //         $order->save();
-    //     }
-    // }
+    protected function updateOrderTotalPrice($orderId)
+    {
+        if (!$orderId) return;
+
+        $order = Order::with('orderItems')->find($orderId);
+        if ($order) {
+            $totalPrice = $order->orderItems->sum(function ($item) {
+                return $item->quantity * $item->price_at_order;
+            });
+            $order->total_price = $totalPrice;
+            $order->save();
+        }
+    }
 }

@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User; // Pastikan model User di-import
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Validator; // Untuk validasi
-use Illuminate\Validation\Rules; // Untuk aturan password
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules;
 
 class UserController extends Controller
 {
@@ -15,8 +16,9 @@ class UserController extends Controller
      */
     public function index()
     {
-        $users = User::latest()->paginate(10); // Ambil 10 user terbaru dengan pagination
-        return view('users.index', compact('users'));
+        $users = User::latest()->paginate(10);
+        // Path view sudah benar
+        return view('admin.users.index', compact('users'));
     }
 
     /**
@@ -24,7 +26,8 @@ class UserController extends Controller
      */
     public function create()
     {
-        return view('users.create');
+        // DIPERBAIKI: Mengarahkan ke view admin
+        return view('admin.users.create');
     }
 
     /**
@@ -32,16 +35,19 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
+        // DIPERBAIKI: Validasi role disesuaikan dengan enum di migrasi
         $validator = Validator::make($request->all(), [
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:'.User::class],
-            'phone' => ['nullable', 'string', 'max:20'], // Sesuai gambar varchar(15)
-            'password' => ['required', 'confirmed', Rules\Password::defaults()], // Rules\Password::defaults() -> min 8 karakter
+            'name' => ['required', 'string', 'max:100'],
+            'email' => ['required', 'string', 'email', 'max:100', 'unique:'.User::class],
+            'phone' => ['nullable', 'string', 'max:20'],
+            'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'address' => ['nullable', 'string'],
+            'role' => ['required', Rule::in(['customer', 'cashier', 'admin'])],
         ]);
 
         if ($validator->fails()) {
-            return redirect()->route('users.create')
+            // DIPERBAIKI: Mengarahkan ke route admin
+            return redirect()->route('admin.users.create')
                         ->withErrors($validator)
                         ->withInput();
         }
@@ -52,75 +58,76 @@ class UserController extends Controller
             'phone' => $request->phone,
             'password' => Hash::make($request->password),
             'address' => $request->address,
-            // remember_token, created_at, updated_at akan dihandle Laravel
+            'role' => $request->role,
         ]);
 
-        return redirect()->route('users.index')->with('success', 'Pengguna baru berhasil ditambahkan.');
+        return redirect()->route('admin.users.index')->with('success', 'Pengguna baru berhasil ditambahkan.');
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(User $user_id) // Route model binding
+    public function show(User $user) // DIPERBAIKI: Menggunakan variabel $user
     {
-        // $user_id akan menjadi instance User yang ditemukan berdasarkan ID
-        return view('users.show', ['user' => $user_id]);
+        // DIPERBAIKI: Mengarahkan ke view admin dan menggunakan variabel $user
+        return view('admin.users.show', ['user' => $user]);
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(User $user_id) // Route model binding
+    public function edit(User $user) // DIPERBAIKI: Menggunakan variabel $user
     {
-        return view('users.edit', ['user' => $user_id]);
+        // DIPERBAIKI: Mengarahkan ke view admin dan menggunakan variabel $user
+        return view('admin.users.edit', ['user' => $user]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, User $user_id) // Route model binding
+    public function update(Request $request, User $user) // DIPERBAIKI: Menggunakan variabel $user
     {
+        // DIPERBAIKI: Validasi disesuaikan dengan skema baru dan pengecualian unik
         $validator = Validator::make($request->all(), [
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:'.User::class.',email,'.$user_id->user_id.',user_id'], // Abaikan email user saat ini
+            'name' => ['required', 'string', 'max:100'],
+            'email' => ['required', 'string', 'email', 'max:100', Rule::unique('users')->ignore($user->user_id, 'user_id')],
             'phone' => ['nullable', 'string', 'max:20'],
-            'password' => ['nullable', 'confirmed', Rules\Password::defaults()], // Password opsional
+            'password' => ['nullable', 'confirmed', Rules\Password::defaults()],
             'address' => ['nullable', 'string'],
+            'role' => ['required', Rule::in(['customer', 'cashier', 'admin'])],
         ]);
 
          if ($validator->fails()) {
-            return redirect()->route('users.edit', $user_id->user_id)
+             // DIPERBAIKI: Mengarahkan ke route admin dan menggunakan ID dari objek $user
+            return redirect()->route('admin.users.edit', $user->user_id)
                         ->withErrors($validator)
                         ->withInput();
         }
 
-        $dataToUpdate = [
-            'name' => $request->name,
-            'email' => $request->email,
-            'phone' => $request->phone,
-            'address' => $request->address,
-        ];
+        $dataToUpdate = $request->only(['name', 'email', 'phone', 'address', 'role']);
 
         if ($request->filled('password')) {
             $dataToUpdate['password'] = Hash::make($request->password);
         }
 
-        $user_id->update($dataToUpdate);
+        // DIPERBAIKI: Menggunakan objek $user untuk update
+        $user->update($dataToUpdate);
 
-        return redirect()->route('users.index')->with('success', 'Data pengguna berhasil diperbarui.');
+        return redirect()->route('admin.users.index')->with('success', 'Data pengguna berhasil diperbarui.');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(User $user_id) // Route model binding
+    public function destroy(User $user) // DIPERBAIKI: Menggunakan variabel $user
     {
         try {
-            $user_id->delete();
-            return redirect()->route('users.index')->with('success', 'Pengguna berhasil dihapus.');
-        } catch (\Exception $e) {
-            //  Log error atau tampilkan pesan error jika ada foreign key constraint, dll.
-            return redirect()->route('users.index')->with('error', 'Gagal menghapus pengguna. Mungkin terkait dengan data lain.');
+            // DIPERBAIKI: Menggunakan objek $user untuk delete
+            $user->delete();
+            return redirect()->route('admin.users.index')->with('success', 'Pengguna berhasil dihapus.');
+        } catch (\Illuminate\Database\QueryException $e) {
+            // Tangani error jika user masih memiliki order/review/payment
+            return redirect()->route('admin.users.index')->with('error', 'Gagal menghapus pengguna. Pengguna ini masih terkait dengan data pesanan atau ulasan.');
         }
     }
 }

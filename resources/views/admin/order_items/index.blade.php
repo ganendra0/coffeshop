@@ -71,9 +71,9 @@
                             <td>{{ Str::limit($item->notes, 50) }}</td>
                             <td>{{ $item->created_at->format('d M Y, H:i') }}</td>
                             <td>
-                                <a href="{{ route('order_items.edit', $item->item_id) }}" class="btn btn-sm btn-warning" title="Edit">
-                                    <i class="fas fa-edit"></i>
-                                </a>
+                                <a href="{{ route('order_items.edit', $item->order_item_id) }}" class="btn btn-sm btn-warning">
+    <i class="fas fa-edit"></i>
+</a>
                                 <button type="button" class="btn btn-sm btn-danger" title="Hapus" data-bs-toggle="modal" data-bs-target="#deleteItemModal-{{ $item->item_id }}">
                                     <i class="fas fa-trash"></i>
                                 </button>
@@ -91,11 +91,11 @@
                                             </div>
                                             <div class="modal-footer">
                                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                                                <form action="{{ route('order_items.destroy', $item->item_id) }}" method="POST" style="display: inline;">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn btn-danger">Hapus</button>
-                                                </form>
+                                                <form action="{{ route('order_items.destroy', $item->order_item_id) }}" method="POST">
+    @csrf
+    @method('DELETE')
+    <button type="submit" class="btn btn-danger">Hapus</button>
+</form>
                                             </div>
                                         </div>
                                     </div>
